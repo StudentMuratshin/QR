@@ -22,6 +22,8 @@ public:
 
 	Matrix operator*(const Matrix& b) const;
 
+	Matrix operator*(const double b) const;
+
 	Matrix operator+(const Matrix& other)const;
 
 	Matrix operator-(const Matrix& other)const;

@@ -36,7 +36,7 @@ public:
 
 };
 
-Matrix Gram_Schmidt(const signed int n, Matrix& arr);
+Matrix Gram_Schmidt(Matrix& arr);
 
 double Dot_product(const Matrix a, const Matrix b);
 

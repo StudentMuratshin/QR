@@ -6,15 +6,15 @@ using namespace std;
 
 
 
-Matrix Gram_Schmidt(const signed int n, Matrix& arr)
+Matrix Gram_Schmidt(Matrix& arr)
 {
-    Matrix b{ 3,4 };
+    Matrix b{ arr.getH(), arr.getW() };
     for (int j = 0; j < arr.getW(); j++)
     {
         b.ref(0, j) = arr.get(0, j);
     }
-    Matrix term = Matrix{ 1,4 };
-    for (int i = 1; i < n; i++)
+    Matrix term = Matrix{ 1, arr.getW() };
+    for (int i = 1; i < arr.getH(); i++)
     {
         term = Matrix{ 1,4 };
 

@@ -13,7 +13,7 @@ int main()
         3,2,8,-7
     } };
 
-    Matrix res = Gram_Schmidt(n, mat);
+    Matrix res = Gram_Schmidt(mat);
 
     for (int i = 0; i < res.getH(); i++)
     {

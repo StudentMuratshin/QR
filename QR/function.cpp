@@ -1,33 +1,40 @@
 #include "function.h"
 #include <vector>
-#include <Eigen/Dense>
+#include <stdexcept>
+#include <cmath>
 
 using namespace std;
-
-
 
 Matrix Gram_Schmidt(Matrix& arr)
 {
     Matrix b{ arr.getH(), arr.getW() };
+    Matrix e{ arr.getH(), arr.getW() };
     for (int j = 0; j < arr.getW(); j++)
     {
         b.ref(0, j) = arr.get(0, j);
+        e.ref(0, j) = arr.get(0, j) / pow(Dot_product(arr.getRow(0), arr.getRow(0)), 1. / 2.);
     }
     Matrix term = Matrix{ 1, arr.getW() };
     for (int i = 1; i < arr.getH(); i++)
     {
-        term = Matrix{ 1,4 };
+        term = Matrix{ 1, arr.getW() };
 
         for (int j = 0; j < i; j++)
         {
-            term = term - b.getRow(j) * (Dot_product(arr.getRow(i), b.getRow(j)) / Dot_product(b.getRow(j), b.getRow(j)));
+            term = term - b.getRow(j) * (Dot_product(b.getRow(j), arr.getRow(i) ) / Dot_product(b.getRow(j), b.getRow(j)));
         }
         for (int j = 0; j < b.getW(); j++)
         {
-            b.ref(i, j) = arr.get(i, j) + term.get(0, j);
+            double x = arr.get(i, j), y = term.get(0, j);
+            b.ref(i, j) = x + y;
+        }
+        for (int j = 0; j < b.getW(); j++)
+        {
+            double n = Dot_product(b.getRow(i), b.getRow(i));
+            e.ref(i, j) = b.get(i,j) / sqrt(n);
         }
     }
-    return b;
+    return e;
 }
 
 double Dot_product(const Matrix a, const Matrix b)
@@ -35,7 +42,6 @@ double Dot_product(const Matrix a, const Matrix b)
     Matrix t = a * b.transpose();
     return t.get(0,0);
 }
-
 
 
 Matrix::Matrix(int h, int w, const double* coefficients) {
@@ -101,6 +107,18 @@ Matrix Matrix::operator*(const double b) const {
     return Matrix(h, w, v.data());
 }
 
+Matrix Matrix::operator/(const double b) const {
+    const Matrix& a = *this;
+    int h = a.size.h;
+    int w = a.size.w;
+    std::vector<double> v;
+    for (int i = 0; i < h; i++)
+        for (int j = 0; j < w; j++) {
+            v.push_back(a.get(i, j) / b);
+        }
+    return Matrix(h, w, v.data());
+}
+
 Matrix Matrix::operator+(const Matrix& other)const {
     if (other.size.w != size.w || other.size.h != size.h) {
         throw std::runtime_error("Can't add matricies with incompatible sizes!");
@@ -147,3 +165,11 @@ int Matrix::getH() const {
 }
 
 
+Matrix Matrix::QR()
+{
+    Matrix& a = *this;
+    Matrix Q = Gram_Schmidt(a);
+    Matrix R = Q * a.transpose();
+    return Q;
+
+}

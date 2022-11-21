@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <Eigen/Dense>
 using namespace std;
 
 class Matrix {
@@ -24,11 +23,15 @@ public:
 
 	Matrix operator*(const double b) const;
 
+	Matrix operator/(const double b) const;
+
 	Matrix operator+(const Matrix& other)const;
 
 	Matrix operator-(const Matrix& other)const;
 
 	Matrix getRow(int col);
+
+	Matrix QR();
 
 	Matrix transpose()const;
 	int getW() const;

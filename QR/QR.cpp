@@ -1,19 +1,17 @@
 #include <iostream>
 #include "function.h"
 #include <vector>
-#include <Eigen/Dense>
 
 using namespace std;
 int main()
 {
-    int n = 3;
-    Matrix mat = { 3,4,{
-        1,2,2,-1,
-        1,1,-5,3,
-        3,2,8,-7
+    Matrix mat = { 3,3,{
+        1,1,1,
+        0,1,1,
+        0,0,1
     } };
 
-    Matrix res = Gram_Schmidt(mat);
+    Matrix res = mat.QR();
 
     for (int i = 0; i < res.getH(); i++)
     {

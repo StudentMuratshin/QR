@@ -6,19 +6,18 @@ using namespace std;
 int main()
 {
     Matrix mat = { 3,3,{
-        1,1,1,
-        0,1,1,
-        0,0,1
+        1,2,3,
+        4,5,6,
+        7,8,9
     } };
+    
+    pair<Matrix,Matrix> res = mat.QR();
 
-    Matrix res = mat.QR();
+    cout << res.first << endl;
 
-    for (int i = 0; i < res.getH(); i++)
-    {
-        for (int j = 0; j < res.getW(); j++)
-        {
-            cout << res.get(i, j) << " ";
-        }
-        cout << endl;
-    }
+    cout << res.second << endl;
+    
+    Matrix ans = res.first * res.second;
+    
+    cout << ans;
 }

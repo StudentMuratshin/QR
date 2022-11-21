@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iostream>
 using namespace std;
 
 class Matrix {
@@ -23,15 +24,18 @@ public:
 
 	Matrix operator*(const double b) const;
 
+	friend ostream& operator<<(ostream& out, Matrix& x);
+
 	Matrix operator/(const double b) const;
 
 	Matrix operator+(const Matrix& other)const;
 
 	Matrix operator-(const Matrix& other)const;
 
+	Matrix getColumn(int col);
 	Matrix getRow(int col);
 
-	Matrix QR();
+	pair<Matrix, Matrix> QR();
 
 	Matrix transpose()const;
 	int getW() const;

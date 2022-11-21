@@ -1,9 +1,13 @@
 #include "function.h"
+#include <iostream>
 #include <vector>
 #include <stdexcept>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
+
+
 
 Matrix Gram_Schmidt(Matrix& arr)
 {
@@ -11,30 +15,32 @@ Matrix Gram_Schmidt(Matrix& arr)
     Matrix e{ arr.getH(), arr.getW() };
     for (int j = 0; j < arr.getW(); j++)
     {
-        b.ref(0, j) = arr.get(0, j);
-        e.ref(0, j) = arr.get(0, j) / pow(Dot_product(arr.getRow(0), arr.getRow(0)), 1. / 2.);
+        b.ref(0, j) = arr.get(j, 0);
+        e.ref(0, j) = arr.get(j, 0) / pow(Dot_product(arr.getColumn(0), arr.getColumn(0)), 1. / 2.);
     }
-    Matrix term = Matrix{ 1, arr.getW() };
+    Matrix term = Matrix{ 1, arr.getH() };
     for (int i = 1; i < arr.getH(); i++)
     {
-        term = Matrix{ 1, arr.getW() };
+        term = Matrix{ 1, arr.getH() };
 
         for (int j = 0; j < i; j++)
         {
-            term = term - b.getRow(j) * (Dot_product(b.getRow(j), arr.getRow(i) ) / Dot_product(b.getRow(j), b.getRow(j)));
+            term = term - b.getRow(j) * (Dot_product(b.getRow(j), arr.getColumn(i) ) / Dot_product(b.getRow(j), b.getRow(j)));
         }
         for (int j = 0; j < b.getW(); j++)
         {
-            double x = arr.get(i, j), y = term.get(0, j);
+            double x = arr.get(j, i), y = term.get(0, j);
             b.ref(i, j) = x + y;
         }
         for (int j = 0; j < b.getW(); j++)
         {
             double n = Dot_product(b.getRow(i), b.getRow(i));
-            e.ref(i, j) = b.get(i,j) / sqrt(n);
+            double digit = b.get(i, j) / sqrt(n);
+            e.ref(i, j) = ((abs(digit) < 1e-10) ? 0 : digit);
+            //e.ref(i, j) = digit;
         }
     }
-    return e;
+    return e.transpose();
 }
 
 double Dot_product(const Matrix a, const Matrix b)
@@ -90,7 +96,7 @@ Matrix Matrix::operator*(const Matrix& b) const {
             double sum = 0;
             for (int k = 0; k < a.size.w; k++)
                 sum += a.get(i, k) * b.get(k, j);
-            v.push_back(sum);
+            v.push_back(((abs(sum) < 1e-10) ? 0 : sum));
         }
     return Matrix(h, w, v.data());
 }
@@ -102,10 +108,13 @@ Matrix Matrix::operator*(const double b) const {
     std::vector<double> v;
     for (int i = 0; i < h; i++)
         for (int j = 0; j < w; j++) {
-            v.push_back(b * a.get(i, j));
+            double digit = b * a.get(i, j);
+            v.push_back(((abs(digit) < 1e-10) ? 0 : digit));
         }
     return Matrix(h, w, v.data());
 }
+
+
 
 Matrix Matrix::operator/(const double b) const {
     const Matrix& a = *this;
@@ -141,21 +150,50 @@ Matrix Matrix::operator-(const Matrix& other)const {
     return Matrix(size.h, size.w, c.data());
 }
 
-Matrix Matrix::getRow(int col) {
+Matrix Matrix::getColumn(int col) {
+    vector<double>col_data;
+    for (int i = 0; i < size.w; i++) {
+        col_data.push_back(get(i, col));
+    }
+    return Matrix{ 1, size.w, col_data.data() };
+}
+Matrix Matrix::getRow(int col)
+{
     vector<double>col_data;
     for (int i = 0; i < size.w; i++) {
         col_data.push_back(get(col, i));
     }
-    return Matrix{ 1, size.w, col_data.data() };
+    return Matrix{  1, size.h, col_data.data() };
 }
 Matrix Matrix::transpose() const {
     vector<double>col_data;
-    for (int i = 0; i < size.h; i++) {
-        for (int j = 0; j < size.w; j++) {
-            col_data.push_back(get(i, j));
+    if (size.h == 1 || size.w == 1)
+    {
+        for (int i = 0; i < size.h; i++) {
+            for (int j = 0; j < size.w; j++) {
+                col_data.push_back(get(i, j));
+            }
         }
+        return Matrix{ size.w,size.h,col_data.data() };
     }
-    return Matrix{ size.w,size.h,col_data.data() };
+    else if (size.h == size.w)
+    {
+        for (int i = 0; i < size.h; i++) {
+            for (int j = 0; j < size.w; j++) {
+                col_data.push_back(get(j, i));
+            }
+        }
+        return Matrix{ size.w,size.h,col_data.data() };
+    }
+    else
+    {
+        for (int i = 0; i < size.w; i++) {
+            for (int j = 0; j < size.h; j++) {
+                col_data.push_back(get(j, i));
+            }
+        }
+        return Matrix{ size.w,size.h,col_data.data() };
+    }
 }
 int Matrix::getW() const {
     return size.w;
@@ -165,11 +203,21 @@ int Matrix::getH() const {
 }
 
 
-Matrix Matrix::QR()
+pair<Matrix,Matrix> Matrix::QR()
 {
     Matrix& a = *this;
     Matrix Q = Gram_Schmidt(a);
-    Matrix R = Q * a.transpose();
-    return Q;
+    Matrix R = Q.transpose() * a;
+    return pair<Matrix, Matrix>(Q, R);
 
+}
+
+ostream& operator<<(ostream& out, Matrix& x)
+{
+    for (int i = 0; i < x.getH(); i++) {
+        for (int j = 0; j < x.getW(); j++)
+            out << x.get(i, j) << " ";
+        out << endl;
+    }
+    return out;
 }

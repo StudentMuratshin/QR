@@ -221,3 +221,45 @@ ostream& operator<<(ostream& out, Matrix& x)
     }
     return out;
 }
+
+Matrix Eigen_Values(const Matrix B)
+{
+    Matrix A = B;
+    double Max_prev = 0, Max = 0;
+    do {
+        Max_prev = A.getDiagonal().getMaxVal();
+        pair<Matrix, Matrix> QR = A.QR();
+        Matrix Q = QR.first;
+        Matrix R = QR.second;
+        A = R * Q;
+        Max = A.getDiagonal().getMaxVal();
+    } while (abs(Max - Max_prev) >= 1e-4);
+    return A.getDiagonal();
+}
+
+double Matrix::getMaxVal()
+{
+    Matrix& A = *this;
+    double Max = 0;
+    for (int i = 0; i < A.getH(); i++)
+    {
+        for (int j = 0; j < A.getW(); j++)
+        {
+            if (A.get(i, j) > Max)
+            {
+                Max = A.get(i, j);
+            }
+        }
+    }
+    return Max;
+}
+
+Matrix Matrix::getDiagonal()
+{
+    vector <double> col_data;
+    for (int i = 0; i < min(size.w, size.h); i++)
+    {
+        col_data.push_back(get(i, i));
+    }
+    return Matrix{ 1, min(size.w, size.h), col_data.data() };
+}

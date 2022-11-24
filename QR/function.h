@@ -19,7 +19,6 @@ public:
 	double get(int i, int j)const;
 	double& ref(int i, int j);
 
-
 	Matrix operator*(const Matrix& b) const;
 
 	Matrix operator*(const double b) const;
@@ -33,7 +32,12 @@ public:
 	Matrix operator-(const Matrix& other)const;
 
 	Matrix getColumn(int col);
+
+	Matrix getDiagonal();
+
 	Matrix getRow(int col);
+
+	double getMaxVal();
 
 	pair<Matrix, Matrix> QR();
 
@@ -47,3 +51,6 @@ Matrix Gram_Schmidt(Matrix& arr);
 
 double Dot_product(const Matrix a, const Matrix b);
 
+bool Check(Matrix& A);
+
+Matrix Eigen_Values(const Matrix B);

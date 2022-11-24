@@ -47,10 +47,10 @@ public:
 
 };
 
+Matrix Make_square(const Matrix b);
+
 Matrix Gram_Schmidt(Matrix& arr);
 
 double Dot_product(const Matrix a, const Matrix b);
-
-bool Check(Matrix& A);
 
 Matrix Eigen_Values(const Matrix B);

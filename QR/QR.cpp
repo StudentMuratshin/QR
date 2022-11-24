@@ -6,21 +6,22 @@ using namespace std;
 int main()
 {
     Matrix mat = { 3,3,{
-        2,3,-1,
-        7,3,3,
-        -1,-2,4
+        3,2,2,
+        2,3,-2,
+        3,-2,21
     } };
-    Matrix eigen = Eigen_Values(mat);
-    cout << eigen << endl;
-    cout << mat;
+    Matrix e = Eigen_Values(mat);
+    cout << e << endl;
 
-    //pair<Matrix,Matrix> res = mat.QR();
+    cout << "A: " << endl << mat << endl;
 
-    //cout << res.first << endl;
+    pair<Matrix,Matrix> res = mat.QR();
 
-    //cout << res.second << endl;
-    //
-    //Matrix ans = res.first * res.second;
-    //
-    //cout << ans;
+    cout << "Q: " << endl << res.first << endl;
+
+    cout << "R: " << endl << res.second << endl;
+    
+    Matrix ans = res.first * res.second;
+    
+    cout << "Q*R: " << endl << ans;
 }

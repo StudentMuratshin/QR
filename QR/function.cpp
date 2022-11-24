@@ -195,9 +195,11 @@ Matrix Matrix::transpose() const {
         return Matrix{ size.w,size.h,col_data.data() };
     }
 }
+
 int Matrix::getW() const {
     return size.w;
 }
+
 int Matrix::getH() const {
     return size.h;
 }
@@ -206,10 +208,19 @@ int Matrix::getH() const {
 pair<Matrix,Matrix> Matrix::QR()
 {
     Matrix& a = *this;
-    Matrix Q = Gram_Schmidt(a);
-    Matrix R = Q.transpose() * a;
-    return pair<Matrix, Matrix>(Q, R);
-
+    if (a.getH() != a.getW())
+    {
+        Matrix a_sq = Make_square(a);
+        Matrix Q = Gram_Schmidt(a_sq);
+        Matrix R = Q.transpose() * a;
+        return pair<Matrix, Matrix>(Q, R);
+    }
+    else
+    {
+        Matrix Q = Gram_Schmidt(a);
+        Matrix R = Q.transpose() * a;
+        return pair<Matrix, Matrix>(Q, R);
+    }
 }
 
 ostream& operator<<(ostream& out, Matrix& x)
@@ -220,6 +231,20 @@ ostream& operator<<(ostream& out, Matrix& x)
         out << endl;
     }
     return out;
+}
+
+Matrix Make_square(const Matrix b)
+{
+    int n = min(b.getH(), b.getW());
+    Matrix res{ n , n };
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            res.ref(i, j) = b.get(i, j);
+        }
+    }
+    return res;
 }
 
 Matrix Eigen_Values(const Matrix B)
@@ -233,7 +258,7 @@ Matrix Eigen_Values(const Matrix B)
         Matrix R = QR.second;
         A = R * Q;
         Max = A.getDiagonal().getMaxVal();
-    } while (abs(Max - Max_prev) >= 1e-4);
+    } while (abs(Max - Max_prev) >= 1e-5);
     return A.getDiagonal();
 }
 
